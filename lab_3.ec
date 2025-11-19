@@ -64,7 +64,7 @@ void PrintMenu()
     printf("1) Задача 1\n");
     printf("2) Задача 2\n");
     printf("3) Задача 3\n");
-    printf("4) Задача4\n");
+    printf("4) Задача 4\n");
     printf("5) Задача 5\n");
     printf("0) Выход из программы\n");
 }
