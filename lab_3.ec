@@ -20,24 +20,24 @@ void ConnectDB()
     strcpy(db_name, "students");
     strcpy(user, "pmi-b2713");
     strcpy(password, "l9C80!DaN");
-    printf("Connecting to db \"%s\"...\n", db_name);
+    printf("Подключение к БД \"%s\"...\n", db_name);
     exec SQL connect to :db_name user :user using :password;
     if (sqlca.sqlcode < 0)
     {
-        printf("connect error! code %d: %s\n",
+        printf("Ошибка подключения! код %d: %s\n",
                sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         return;
     }
-    printf("Success! code %d\n", sqlca.sqlcode);
-    printf("Connecting to schema \"pmib2713\"...\n");
+    printf("Успех! код %d\n", sqlca.sqlcode);
+    printf("Подключение к схеме \"pmib2713\"...\n");
     exec SQL set search_path to pmib2713;
     if (sqlca.sqlcode < 0)
     {
-        printf("schema error! code %d: %s\n",
+        printf("Ошибка подключения к схеме! код %d: %s\n",
                sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         return;
     }
-    printf("Success! code %d\n", sqlca.sqlcode);
+    printf("Успех! код %d\n", sqlca.sqlcode);
 }
 
 /* ----------------------------------------- */
@@ -45,15 +45,15 @@ void ConnectDB()
 /* ----------------------------------------- */
 void DisconnectDB()
 {
-    printf("Disconnecting from db \"%s\"...\n", db_name);
+    printf("Отключение от БД \"%s\"...\n", db_name);
     exec SQL disconnect :db_name;
     if (sqlca.sqlcode < 0)
     {
-        printf("disconnect error! code %d: %s\n",
+        printf("Ошибка отключения! код %d: %s\n",
                sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         return;
     }
-    printf("Success! code %d\n", sqlca.sqlcode);
+    printf("Успех! код %d\n", sqlca.sqlcode);
 }
 
 /* ----------------------------------------- */
@@ -61,12 +61,12 @@ void DisconnectDB()
 /* ----------------------------------------- */
 void PrintMenu()
 {
-    printf("1) Task1\n");
-    printf("2) Task2\n");
-    printf("3) Task3\n");
-    printf("4) Task4\n");
-    printf("5) Task5\n");
-    printf("6) Stop the program\n");
+    printf("1) Задача 1\n");
+    printf("2) Задача 2\n");
+    printf("3) Задача 3\n");
+    printf("4) Задача4\n");
+    printf("5) Задача 5\n");
+    printf("0) Выход из программы\n");
 }
 
 /* ----------------------------------------- */
@@ -78,7 +78,7 @@ void Task1()
         int cnt;
     exec SQL end declare section;
 
-    printf("Starting Task1: count supplies for products that contain green parts...\n");
+    printf("Задача 1: Выдать число поставок, выполненных для изделий с деталями зеленого цвета.\n");
     exec SQL begin work;
 
     exec SQL
@@ -93,11 +93,11 @@ void Task1()
 
     if (sqlca.sqlcode < 0)
     {
-        printf("Task1 error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 1: Ошибка! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
         return;
     }
-    printf("Success! Total supplies for such products: %d\n", cnt);
+    printf("Задача 1: Успех! Число поставок: %d\n", cnt);
     exec SQL commit work;
 }
 
@@ -106,7 +106,7 @@ void Task1()
 /* ----------------------------------------- */
 void Task2()
 {
-    printf("Starting Task2: swap towns for products with shortest and longest names...\n");
+    printf("Задача 2: Поменять местами города, где размещены изделия с самым коротким и самым длинным названием...\n");
     exec SQL begin work;
 
     exec SQL
@@ -125,11 +125,11 @@ void Task2()
 
     if (sqlca.sqlcode < 0)
     {
-        printf("Task2 update error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 2: Ошибка! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
         return;
     }
-    printf("Task2 success! Rows updated: %d\n", sqlca.sqlerrd[2]);
+    printf("Задача 2: Успех! Изменено строк: %d\n", sqlca.sqlerrd[2]);
     exec SQL commit work;
 }
 
@@ -142,7 +142,7 @@ void Task3()
         char n_det[6];
     exec SQL end declare section;
 
-    printf("Starting Task3: parts with supplies lighter than average for London products...\n");
+    printf("Задача 3: Найти детали, имеющие поставки, вес которых меньше среднего веса поставок этой детали для изделий из Лондона.\n");
 
     exec SQL declare curs_parts cursor for
         select distinct spj.n_det
@@ -162,7 +162,7 @@ void Task3()
 
     if (sqlca.sqlcode < 0)
     {
-        printf("Task3 open cursor error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 3: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
         return;
     }
@@ -170,14 +170,14 @@ void Task3()
     exec SQL fetch curs_parts into :n_det;
     if (sqlca.sqlcode == 100)
     {
-        printf("Task3: No results found.\n");
+        printf("Задача 3: Нет Деталей.\n");
         exec SQL close curs_parts;
         exec SQL commit work;
         return;
     }
     if (sqlca.sqlcode < 0)
     {
-        printf("Task3 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 3: Ошибка в получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL close curs_parts;
         exec SQL rollback work;
         return;
@@ -193,7 +193,7 @@ void Task3()
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
-            printf("Task3 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            printf("Задача 3: Ошибка в получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
             break;
         }
         printf("%s\n", n_det);
@@ -201,7 +201,7 @@ void Task3()
     }
 
     exec SQL close curs_parts;
-    printf("Task3 Success! Rows: %d\n", rowcount);
+    printf("Задача 3: Успех! Строк: %d\n", rowcount);
     exec SQL commit work;
 }
 
@@ -214,7 +214,7 @@ void Task4()
         char n_post[6];
     exec SQL end declare section;
 
-    printf("Starting Task4: suppliers who do not supply any parts supplied from London...\n");
+    printf("Задача 4: Выбрать поставщиков, не поставляющих ни одной из деталей, поставляемых поставщиками, находящимися в Лондоне.\n");
 
     exec SQL declare curs_sup cursor for
         select s.n_post
@@ -237,7 +237,7 @@ void Task4()
 
     if (sqlca.sqlcode < 0)
     {
-        printf("Task4 open cursor error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 4: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
         return;
     }
@@ -245,14 +245,14 @@ void Task4()
     exec SQL fetch curs_sup into :n_post;
     if (sqlca.sqlcode == 100)
     {
-        printf("Task4: No suppliers found.\n");
+        printf("Задача 4: Поставщиков не найдено.\n");
         exec SQL close curs_sup;
         exec SQL commit work;
         return;
     }
     if (sqlca.sqlcode < 0)
     {
-        printf("Task4 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 4: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL close curs_sup;
         exec SQL rollback work;
         return;
@@ -268,7 +268,7 @@ void Task4()
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
-            printf("Task4 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            printf("Задача 4: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
             break;
         }
         printf("%s\n", n_post);
@@ -276,7 +276,7 @@ void Task4()
     }
 
     exec SQL close curs_sup;
-    printf("Task4 Success! Rows: %d\n", rowcount);
+    printf("Задача 4: Успех! Строк: %d\n", rowcount);
     exec SQL commit work;
 }
 
@@ -292,7 +292,7 @@ void Task5()
         char town[20];
     exec SQL end declare section;
 
-    printf("Starting Task5: suppliers who supplied ONLY quantities from 200 to 500...\n");
+    printf("Задача 5: Выдать полную информацию о поставщиках, выполнивших поставки ТОЛЬКО с объемом от 200 до 500 деталей.\n");
 
     exec SQL declare curs_only200_500 cursor for
         select s.n_post, s.name, s.reiting, s.town
@@ -307,7 +307,7 @@ void Task5()
 
     if (sqlca.sqlcode < 0)
     {
-        printf("Task5 open cursor error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 5: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
         return;
     }
@@ -315,14 +315,14 @@ void Task5()
     exec SQL fetch curs_only200_500 into :n_post, :name, :reiting, :town;
     if (sqlca.sqlcode == 100)
     {
-        printf("Task5: No suppliers match the condition.\n");
+        printf("Задача 5: Нет поставщиков!\n");
         exec SQL close curs_only200_500;
         exec SQL commit work;
         return;
     }
     if (sqlca.sqlcode < 0)
     {
-        printf("Task5 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+        printf("Задача 5: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL close curs_only200_500;
         exec SQL rollback work;
         return;
@@ -338,7 +338,7 @@ void Task5()
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
-            printf("Task5 fetch error! code %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            printf("Задача 5: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
             break;
         }
         printf("|%.6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
@@ -346,7 +346,7 @@ void Task5()
     }
 
     exec SQL close curs_only200_500;
-    printf("Task5 Success! Rows: %d\n", rowcount);
+    printf("Задача 5: Успех! Строк: %d\n", rowcount);
     exec SQL commit work;
 }
 
@@ -358,9 +358,9 @@ int main()
     ConnectDB();
     while (true)
     {
-        printf("\nWhat to do?\n");
+        printf("\nЧто выполнить?\n");
         PrintMenu();
-        printf("Choose number: ");
+        printf("Выберите номер: ");
         int number;
         if (scanf("%d", &number) != 1)
         {
@@ -377,11 +377,11 @@ int main()
             case 3: Task3(); break;
             case 4: Task4(); break;
             case 5: Task5(); break;
-            case 6:
+            case 0:
                 DisconnectDB();
                 return 0;
             default:
-                printf("Try again!\n");
+                printf("Выберите из доступных номеров!\n");
                 break;
         }
     }
