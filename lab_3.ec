@@ -164,6 +164,7 @@ void Task3()
     {
         printf("Задача 3: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
+        exec SQL close curs_parts;
         return;
     }
 
@@ -194,6 +195,7 @@ void Task3()
         if (sqlca.sqlcode < 0)
         {
             printf("Задача 3: Ошибка в получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            exec SQL close curs_parts;
             break;
         }
         printf("%s\n", n_det);
@@ -239,6 +241,7 @@ void Task4()
     {
         printf("Задача 4: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
+        exec SQL close curs_sup;
         return;
     }
 
@@ -269,6 +272,7 @@ void Task4()
         if (sqlca.sqlcode < 0)
         {
             printf("Задача 4: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            exec SQL close curs_sup;
             break;
         }
         printf("%s\n", n_post);
@@ -295,12 +299,14 @@ void Task5()
     printf("Задача 5: Выдать полную информацию о поставщиках, выполнивших поставки ТОЛЬКО с объемом от 200 до 500 деталей.\n");
 
     exec SQL declare curs_only200_500 cursor for
-        select s.n_post, s.name, s.reiting, s.town
+        select distinct s.n_post, s.name, s.reiting, s.town
         from s
-        join spj on spj.n_post = s.n_post
-        group by s.n_post, s.name, s.reiting, s.town
-        having min(spj.kol) >= 200
-           and max(spj.kol) <= 500;
+        join spj on s.n_post = spj.n_post
+        except
+        select distinct s.n_post, s.name, s.reiting, s.town
+        from s
+        join spj on s.n_post = spj.n_post
+        where spj.kol < 200 or spj.kol > 500;
 
     exec SQL begin work;
     exec SQL open curs_only200_500;
@@ -309,6 +315,7 @@ void Task5()
     {
         printf("Задача 5: Ошибка открытия курсора! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
         exec SQL rollback work;
+        exec SQL close curs_only200_500;
         return;
     }
 
@@ -328,8 +335,10 @@ void Task5()
         return;
     }
 
-    printf("|n_post|name               |reiting|town                |\n");
-    printf("|%.6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
+    printf("+------+--------------------+-------+--------------------+\n");
+    printf("|n_post|name                |reiting|town                |\n");
+    printf("+------+--------------------+-------+--------------------+\n");
+    printf("|%-6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
     int rowcount = 1;
 
     while (1)
@@ -339,11 +348,13 @@ void Task5()
         if (sqlca.sqlcode < 0)
         {
             printf("Задача 5: Ошибка получения! код %d: %s\n", sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+            exec SQL close curs_only200_500;
             break;
         }
-        printf("|%.6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
+        printf("|%-6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
         rowcount++;
     }
+    printf("+------+--------------------+-------+--------------------+\n");
 
     exec SQL close curs_only200_500;
     printf("Задача 5: Успех! Строк: %d\n", rowcount);
