@@ -140,6 +140,7 @@ void Task3()
 {
     exec SQL begin declare section;
         char n_det[6];
+        short n_det_ind;
     exec SQL end declare section;
 
     printf("Задача 3: Найти детали, имеющие поставки, вес которых меньше среднего веса поставок этой детали для изделий из Лондона.\n");
@@ -168,7 +169,7 @@ void Task3()
         return;
     }
 
-    exec SQL fetch curs_parts into :n_det;
+    exec SQL fetch curs_parts into :n_det :n_det_ind;
     if (sqlca.sqlcode == 100)
     {
         printf("Задача 3: Нет Деталей.\n");
@@ -185,12 +186,12 @@ void Task3()
     }
 
     printf("n_det\n");
-    printf("%s\n", n_det);
+    printf("%s\n", (n_det_ind == -1) ? "NULL" : n_det);
     int rowcount = 1;
 
     while (1)
     {
-        exec SQL fetch curs_parts into :n_det;
+        exec SQL fetch curs_parts into :n_det :n_det_ind;
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
@@ -198,7 +199,7 @@ void Task3()
             exec SQL close curs_parts;
             break;
         }
-        printf("%s\n", n_det);
+        printf("%s\n", (n_det_ind == -1) ? "NULL" : n_det);
         rowcount++;
     }
 
@@ -214,6 +215,7 @@ void Task4()
 {
     exec SQL begin declare section;
         char n_post[6];
+        short n_post_ind;
     exec SQL end declare section;
 
     printf("Задача 4: Выбрать поставщиков, не поставляющих ни одной из деталей, поставляемых поставщиками, находящимися в Лондоне.\n");
@@ -245,7 +247,7 @@ void Task4()
         return;
     }
 
-    exec SQL fetch curs_sup into :n_post;
+    exec SQL fetch curs_sup into :n_post :n_post_ind;
     if (sqlca.sqlcode == 100)
     {
         printf("Задача 4: Поставщиков не найдено.\n");
@@ -262,12 +264,12 @@ void Task4()
     }
 
     printf("n_post\n");
-    printf("%s\n", n_post);
+    printf("%s\n", (n_post_ind == -1) ? "NULL" : n_post);
     int rowcount = 1;
 
     while (1)
     {
-        exec SQL fetch curs_sup into :n_post;
+        exec SQL fetch curs_sup into :n_post :n_post_ind;
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
@@ -275,7 +277,7 @@ void Task4()
             exec SQL close curs_sup;
             break;
         }
-        printf("%s\n", n_post);
+        printf("%s\n", (n_post_ind == -1) ? "NULL" : n_post);
         rowcount++;
     }
 
@@ -294,6 +296,10 @@ void Task5()
         char name[20];
         int reiting;
         char town[20];
+        short n_post_ind;
+        short name_ind;
+        short reiting_ind;
+        short town_ind;
     exec SQL end declare section;
 
     printf("Задача 5: Выдать полную информацию о поставщиках, выполнивших поставки ТОЛЬКО с объемом от 200 до 500 деталей.\n");
@@ -319,7 +325,7 @@ void Task5()
         return;
     }
 
-    exec SQL fetch curs_only200_500 into :n_post, :name, :reiting, :town;
+    exec SQL fetch curs_only200_500 into :n_post :n_post_ind, :name :name_ind, :reiting :reiting_ind, :town :town_ind;
     if (sqlca.sqlcode == 100)
     {
         printf("Задача 5: Нет поставщиков!\n");
@@ -338,12 +344,17 @@ void Task5()
     printf("+------+--------------------+-------+--------------------+\n");
     printf("|n_post|name                |reiting|town                |\n");
     printf("+------+--------------------+-------+--------------------+\n");
-    printf("|%-6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
+    printf("|%-6s|%-20s|", (n_post_ind == -1) ? "NULL" : n_post, (name_ind == -1) ? "NULL" : name);
+    if (reiting_ind == -1)
+        printf("   NULL|");
+    else
+        printf("%7d|", reiting);
+    printf("%-20s|\n", (town_ind == -1) ? "NULL" : town);
     int rowcount = 1;
 
     while (1)
     {
-        exec SQL fetch curs_only200_500 into :n_post, :name, :reiting, :town;
+        exec SQL fetch curs_only200_500 into :n_post :n_post_ind, :name :name_ind, :reiting :reiting_ind, :town :town_ind;
         if (sqlca.sqlcode == 100) break;
         if (sqlca.sqlcode < 0)
         {
@@ -351,7 +362,12 @@ void Task5()
             exec SQL close curs_only200_500;
             break;
         }
-        printf("|%-6s|%-20s|%7d|%-20s|\n", n_post, name, reiting, town);
+        printf("|%-6s|%-20s|", (n_post_ind == -1) ? "NULL" : n_post, (name_ind == -1) ? "NULL" : name);
+        if (reiting_ind == -1)
+            printf("   NULL|");
+        else
+            printf("%7d|", reiting);
+        printf("%-20s|\n", (town_ind == -1) ? "NULL" : town);
         rowcount++;
     }
     printf("+------+--------------------+-------+--------------------+\n");
