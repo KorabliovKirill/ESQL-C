@@ -85,6 +85,7 @@ exec SQL begin declare section;
     
     /* --- Результаты Задания 1 (Однострочный) --- */
     float sr_max_kol_res;
+    short sr_max_kol_res_ind;
 
     /* --- Результаты Задания 2 (Многострочный) --- */
     char n_izd_2[7];
@@ -279,7 +280,7 @@ void Task1(void)
     }
     printf("Транзакция начата.\n");
 
-    exec SQL EXECUTE stmt1 INTO :sr_max_kol_res;
+    exec SQL EXECUTE stmt1 INTO :sr_max_kol_res :sr_max_kol_res_ind;
 
     if (sqlca.sqlcode < 0)
     {
@@ -297,7 +298,14 @@ void Task1(void)
     }
     
     printf("Задание 1: Успех!\n");
-    printf("   Среднее максимальных объемов поставок для каждого изделия: %.2f\n", sr_max_kol_res);
+    if (sr_max_kol_res_ind < 0)
+    {
+        printf("   Среднее максимальных объемов поставок для каждого изделия: NULL\n");
+    }
+    else
+    {
+        printf("   Среднее максимальных объемов поставок для каждого изделия: %.2f\n", sr_max_kol_res);
+    }
     
     exec SQL COMMIT WORK;
     if (sqlca.sqlcode < 0) {
